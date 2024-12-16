@@ -21,6 +21,8 @@ interface BluetoothController {
     //device B to connect to device
     fun connectToDevice(device: BluetoothDeviceDomain) : Flow<ConnectionResult>
 
+    suspend fun trySendMessage(message:String): BluetoothMessage?
+
     fun closeConnection()
 
 }

@@ -18,6 +18,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.FlowColumnScopeInstance.weight
+//import androidx.compose.foundation.layout.ColumnScopeInstance.weight
+//import androidx.compose.foundation.layout.FlowColumnScopeInstance.weight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +54,7 @@ import com.example.genelekapp.data.BluetoothSetup1
 import com.example.genelekapp.data.BluetoothUiState
 import com.example.genelekapp.data.BluetoothViewModel
 import com.example.genelekapp.data.BluetoothViewModelFactory
+import com.example.genelekapp.data.ChatScreen
 import com.example.genelekapp.ui.theme.GenElekAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -103,7 +107,16 @@ class MainActivity : ComponentActivity() {
                                 CircularProgressIndicator()
                                 Text(text = "Connecting...")
                             }
-                        } else -> {
+                        }
+                        state.isConnected ->{
+                            ChatScreen(
+                                state = state,
+                                onDisconnect = viewModel::disconnectFromDevice,
+                                onSendMessage = viewModel:: sendMessage
+                            )
+                        }
+
+                        else -> {
                             HomeScreen(
                                 state = state,
                                 viewModel = viewModel,
@@ -229,7 +242,7 @@ fun BluetoothDeviceList(
     modifier: Modifier = Modifier
 ){
     LazyColumn(
-        modifier = Modifier
+        modifier = Modifier.height(300.dp)
     ){
         item { 
             Text(
