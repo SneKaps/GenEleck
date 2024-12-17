@@ -76,7 +76,7 @@ class BluetoothViewModel /*@Inject constructor*/(
             .listen()
     }
 
-    fun sendMessage(message: String){
+    fun sendMessage(message: ByteArray){
         viewModelScope.launch{
             val bluetoothMessage = bluetoothSetup1.trySendMessage(message)
             if (bluetoothMessage != null){

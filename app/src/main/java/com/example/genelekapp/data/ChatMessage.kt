@@ -43,24 +43,32 @@ fun ChatMessage(
             color = Color.Black
         )
 
+
         Text(
-            text = message.message,
+            text = message.toString(),
             color = Color.Black,
             modifier = modifier.widthIn(max = 250.dp)
         )
+
+
     }
 }
 
+
+
+
+/*
 @Preview
 @Composable
 fun ChatMessagePreview(){
     GenElekAppTheme {
         ChatMessage(
             message = BluetoothMessage(
-                message = "HEllo",
+                message = 7,
                 senderName = "Phone1",
                 isFromLocalUser = true
             )
         )
     }
 }
+*/

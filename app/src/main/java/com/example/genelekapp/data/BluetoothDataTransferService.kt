@@ -23,19 +23,26 @@ class BluetoothDataTransferService(
                 } catch (e: IOException) {
                     throw TransferFailedException()
                 }
+                emit(
+                    buffer.copyOfRange(0, byteCount) // Work with raw ByteArray
+                        .toBluetoothMessage(isFromLocalUser = false)
+                )
 
+                /*
                 emit(
                     buffer.decodeToString(
                             endIndex = byteCount
-                    ).toBluetoothMessage(
-                        isFromLocalUser = false
-                    )
+                    ).toBluetoothMessage(isFromLocalUser = false)
                 )
+
+                 */
+
+
             }
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun sendMessage(bytes: ByteArray): Boolean{
+    suspend fun sendMessage(bytes : ByteArray): Boolean{
         return withContext(Dispatchers.IO) {
             try{
                 socket.outputStream.write(bytes)

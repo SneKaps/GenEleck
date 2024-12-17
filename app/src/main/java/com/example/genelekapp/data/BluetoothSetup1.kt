@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.nio.ByteBuffer
 import java.util.UUID
 
 
@@ -199,7 +200,7 @@ class BluetoothSetup1(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun trySendMessage(message: String): BluetoothMessage? {
+    override suspend fun trySendMessage(message: ByteArray): BluetoothMessage? {
         if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)){
             return null
         }
@@ -208,13 +209,18 @@ class BluetoothSetup1(
             return null
         }
 
+        //val messageByteArray = ByteBuffer.putInt()  //converting the String to ByteArray
+
+        //val messageByteArray = ByteBuffer.allocate(7).putInt(message).array()
+
         val bluetoothMessage = BluetoothMessage(
             message = message,
             senderName = bluetoothAdapter?.name ?: "Unknown Name",
             isFromLocalUser = true
         )
 
-        dataTransferService?.sendMessage(bluetoothMessage.toByteArray())
+        //dataTransferService?.sendMessage(bluetoothMessage.toByteArray())
+        dataTransferService?.sendMessage(message)
 
         return bluetoothMessage
     }
