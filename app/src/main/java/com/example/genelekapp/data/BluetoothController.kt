@@ -16,7 +16,7 @@ interface BluetoothController {
     fun stopDiscovery()
 
     //device A to launch a server
-    fun startBluetoothServer() :Flow<ConnectionResult>
+    //fun startBluetoothServer() :Flow<ConnectionResult>
 
     //device B to connect to device
     fun connectToDevice(device: BluetoothDeviceDomain) : Flow<ConnectionResult>

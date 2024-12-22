@@ -38,7 +38,7 @@ class BluetoothSetup1(
 
 
     private val bluetoothManager: BluetoothManager = context.getSystemService(BluetoothManager::class.java)
-    private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+    private var bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
 
     private var dataTransferService : BluetoothDataTransferService? = null
 
@@ -115,6 +115,7 @@ class BluetoothSetup1(
         bluetoothAdapter?.cancelDiscovery()
     }
 
+    /*
     override fun startBluetoothServer() : Flow<ConnectionResult> {
         return flow<ConnectionResult> {
             if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)){
@@ -122,7 +123,7 @@ class BluetoothSetup1(
                 throw SecurityException("No BLUETOOTH_CONNECT permission")
             }
 
-            currentServerSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(
+            currentServerSocket = bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(
                 "data_transfer_service",
                 UUID.fromString(SERVICE_UUID)
             )
@@ -135,7 +136,24 @@ class BluetoothSetup1(
                     shouldLoop = false
                     null
                 }
-                emit(ConnectionResult.ConnectionEstablished)
+                if (currentClientSocket != null) {
+                    emit(ConnectionResult.ConnectionEstablished)
+                    currentServerSocket?.close()
+
+                    val service = BluetoothDataTransferService(currentClientSocket!!)
+                    dataTransferService = service
+
+                    emitAll(
+                        service
+                            .listenFromIncomingMessages()
+                            .map {
+                                ConnectionResult.TransferSucceeded(it)
+                            }
+                    )
+                }
+                /*
+
+                    emit(ConnectionResult.ConnectionEstablished)
                 currentClientSocket?.let {
                     currentServerSocket?.close()
                     val service = BluetoothDataTransferService(it)
@@ -146,8 +164,11 @@ class BluetoothSetup1(
                             .listenFromIncomingMessages()
                             .map {
                                 ConnectionResult.TransferSucceeded(it)
-                            })
+                            }
+                    )
                 }
+
+                 */
             }
         }.onCompletion {
             closeConnection()
@@ -155,23 +176,30 @@ class BluetoothSetup1(
 
     }
 
+     */
+
     override fun connectToDevice(device: BluetoothDeviceDomain): Flow<ConnectionResult> {
         return flow {
             if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)){
                 throw SecurityException("No permission to connect via bluetooth")
             }
 
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             val bluetoothDevice = bluetoothAdapter?.getRemoteDevice(device.address)
 
+
             currentClientSocket = bluetoothDevice
-                ?.createRfcommSocketToServiceRecord(
+                ?.createInsecureRfcommSocketToServiceRecord(
                     UUID.fromString(SERVICE_UUID)
                 )
+            //currentClientSocket?.connect()
             stopDiscovery()
 
+            /*
             if(bluetoothAdapter?.bondedDevices?.contains(bluetoothDevice) == false){
 
             }
+             */
 
             currentClientSocket.let { socket->
                 try {
@@ -227,9 +255,9 @@ class BluetoothSetup1(
 
     override fun closeConnection() {
         currentClientSocket?.close()
-        currentServerSocket?.close()
+        //currentServerSocket?.close()
         currentClientSocket = null
-        currentServerSocket = null
+        //currentServerSocket = null
     }
 
 

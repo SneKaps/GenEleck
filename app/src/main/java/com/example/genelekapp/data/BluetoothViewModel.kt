@@ -69,12 +69,15 @@ class BluetoothViewModel /*@Inject constructor*/(
         ) }
     }
 
+    /*
     fun waitForIncoming(){
         _state.update { it.copy(isConnecting = true) }
         deviceConnectionJob = bluetoothSetup1
             .startBluetoothServer()
             .listen()
     }
+
+    */
 
     fun sendMessage(message: ByteArray){
         viewModelScope.launch{
@@ -103,8 +106,7 @@ class BluetoothViewModel /*@Inject constructor*/(
             }
         }
     }
-
-     */
+    */
 
     private fun Flow<ConnectionResult>.listen() : Job {
         return onEach { result ->

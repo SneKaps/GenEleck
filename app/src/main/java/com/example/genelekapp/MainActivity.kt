@@ -55,6 +55,7 @@ import com.example.genelekapp.data.BluetoothUiState
 import com.example.genelekapp.data.BluetoothViewModel
 import com.example.genelekapp.data.BluetoothViewModelFactory
 import com.example.genelekapp.data.ChatScreen
+//import com.example.genelekapp.data.SendComponent
 import com.example.genelekapp.ui.theme.GenElekAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -74,6 +75,7 @@ class MainActivity : ComponentActivity() {
                 val viewModel: BluetoothViewModel by viewModels { viewModelFactory }
                 //val viewModel : BluetoothViewModel = viewModel()
                 val state by viewModel.state.collectAsState()
+                //val btDevice : BluetoothDeviceDomain
 
                 LaunchedEffect(key1 = state.errorMessage){
                     state.errorMessage?.let{ message ->
@@ -109,18 +111,25 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         state.isConnected ->{
+
                             ChatScreen(
                                 state = state,
                                 onDisconnect = viewModel::disconnectFromDevice,
-                                onSendMessage = viewModel:: sendMessage
+                                onSendMessage = viewModel::sendMessage
                             )
+
+                            /*
+                            SendComponent(viewModel = viewModel)
+
+                             */
                         }
 
                         else -> {
                             HomeScreen(
                                 state = state,
                                 viewModel = viewModel,
-                                onDeviceClick = viewModel::connectToDevice
+                                onDeviceClick = viewModel::connectToDevice,
+                                //btDevice = btDevice,
                         )
                     }
 
@@ -144,13 +153,16 @@ fun HomeScreen(
     //onStopScan: () -> Unit,
     viewModel: BluetoothViewModel,
     //onStartServer : () -> Unit,
-    onDeviceClick : (BluetoothDeviceDomain) -> Unit
+    onDeviceClick : (BluetoothDeviceDomain) -> Unit,
+    //btDevice : BluetoothDeviceDomain
 
 ){
     val context = LocalContext.current
 
     val bluetoothManager: BluetoothManager = context.getSystemService(BluetoothManager::class.java)
     val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+
+    //val btDevice : BluetoothDeviceDomain
 
     val isBluetoothEnabled : Boolean = bluetoothAdapter?.isEnabled == true
 
@@ -190,24 +202,31 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(5.dp))
 
         BluetoothDeviceList(
-            title = "Paired devices",
+            //title = "Paired devices",
+            viewModel = viewModel,
             devices = state.pairedDevices,
-            onClick = onDeviceClick,
+            //onClick = viewModel.connectToDevice(btDevice),
+            //onClick = onDeviceClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
         )
+
+        /*
         
         Spacer(modifier = Modifier.height(5.dp))
         
         BluetoothDeviceList(
-            title = "Scanned devices",
+            //title = "Scanned devices",
+            viewModel = viewModel,
             devices = state.scannedDevices ,
-            onClick = onDeviceClick,
+            //onClick = onDeviceClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
         )
+
+         */
 
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
@@ -225,20 +244,25 @@ fun HomeScreen(
                 Text(text = "Stop Scan")
             }
 
+            /*
             Button(onClick = {
                 viewModel.waitForIncoming()
             }) {
                 Text(text = "Start Server")
             }
+
+             */
         }
     }
 }
 
 @Composable
 fun BluetoothDeviceList(
-    title : String,
+    //title : String,
+    viewModel: BluetoothViewModel,
     devices : List<BluetoothDeviceDomain>,
-    onClick: (BluetoothDeviceDomain) -> Unit,
+    //onClick: (BluetoothDeviceDomain) -> Unit,
+    //btDevice: BluetoothDeviceDomain,
     modifier: Modifier = Modifier
 ){
     LazyColumn(
@@ -246,7 +270,7 @@ fun BluetoothDeviceList(
     ){
         item { 
             Text(
-                text = title,
+                text = "Paired Devices",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(25.dp)
@@ -257,12 +281,38 @@ fun BluetoothDeviceList(
                 text = device.name ?: "No Name",
                 modifier
                     .fillMaxWidth()
-                    .clickable { onClick(device) }
+                    .clickable { viewModel.connectToDevice(device) }
                     .padding(16.dp)
             )
 
         }
     }
+
+    Spacer(modifier = Modifier.height(5.dp))
+
+    LazyColumn(
+        modifier = Modifier.height(300.dp)
+    ){
+        item {
+            Text(
+                text = "Scanned Devices",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(25.dp)
+            )
+        }
+        items(devices){ device->
+            Text(
+                text = device.name ?: "No Name",
+                modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.connectToDevice(device) }
+                    .padding(16.dp)
+            )
+
+        }
+    }
+
     
 }
 

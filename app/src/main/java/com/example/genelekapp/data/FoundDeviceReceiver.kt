@@ -14,12 +14,12 @@ class FoundDeviceReceiver(
         when(intent?.action){
             BluetoothDevice.ACTION_FOUND -> {
                 val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent?.getParcelableExtra(
+                    intent.getParcelableExtra(
                         BluetoothDevice.EXTRA_DEVICE,
                         BluetoothDevice::class.java
                     )
                 } else {
-                    intent?.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                 }
                 device?.let(onDeviceFound)
             }

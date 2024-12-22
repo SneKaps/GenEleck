@@ -45,7 +45,7 @@ fun ChatMessage(
 
 
         Text(
-            text = message.toString(),
+            text = message.message.toString(),
             color = Color.Black,
             modifier = modifier.widthIn(max = 250.dp)
         )
@@ -57,18 +57,18 @@ fun ChatMessage(
 
 
 
-/*
+
 @Preview
 @Composable
 fun ChatMessagePreview(){
     GenElekAppTheme {
         ChatMessage(
             message = BluetoothMessage(
-                message = 7,
+                message = byteArrayOf(7),
                 senderName = "Phone1",
                 isFromLocalUser = true
             )
         )
     }
 }
-*/
+
